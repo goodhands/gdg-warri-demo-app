@@ -1,23 +1,61 @@
 <script setup>
 	import { ref } from 'vue';
 
+	const client = useSupabaseClient()
+	let realtimeChannel
 	const route = useRoute()
+	const { $textClassifier } = useNuxtApp()
   	const { data: movie, pending, error } = await useFetch(() => 'http://www.omdbapi.com/?i=' + route.params.id + '&apikey=713602fe')
 
+	// Fetch reviews and get the refresh method provided by useAsyncData
+	const { data: reviews, refresh: refreshReviews } = await useAsyncData('reviews', async () => {
+		const { data } = await client.from('reviews').select('name, comment, positive, negative, movie').eq('movie', route.params.id)
+
+		return data
+	})
 
 	const formData = ref({
 		comment: '',
+		name: ''
 	});
 
-	const rate = (event) => {
-		event.preventDefault();
+	const rate = async (event) => {
 		// Handle form submission here, e.g., send data to the server.
+		event.preventDefault();
 
 		// Pass comment to MediaPipe and get the sentiment
-		// Store comment and sentiment in localstorage
-		// Display all ratings from localstorage
-		console.log(formData.value);
+		const result = (await $textClassifier).classify(formData.value.comment)
+
+		const sentiments = result.classifications[0].categories
+
+		await client.from('reviews').insert({
+			name: formData.value.name,
+			comment: formData.value.comment,
+			positive: sentiments.filter(rate => rate.categoryName === 'positive')[0].score,
+			negative: sentiments.filter(rate => rate.categoryName === 'negative')[0].score,
+			movie: route.params.id
+		})
+
+		formData.value.name = ''
+		formData.value.comment = ''
 	};
+
+	// Once page is mounted, listen to changes on the `reviews` table and refresh reviews when receiving event
+	onMounted(() => {
+		// Real time listener for new workouts
+		realtimeChannel = client.channel('public:reviews').on(
+			'postgres_changes',
+			{ event: '*', schema: 'public', table: 'reviews' },
+			() => refreshReviews()
+		)
+
+		realtimeChannel.subscribe()
+	})
+
+	// Don't forget to unsubscribe when user left the page
+	onUnmounted(() => {
+		client.removeChannel(realtimeChannel)
+	})
 </script>
 
 <template>
@@ -50,6 +88,13 @@
 				</p>
 				<form @submit="rate">
 					<div class="mb-2">
+						<input v-model="formData.name" type="text"
+									class="mt-1 px-3 py-2
+										bg-white border shadow-sm
+										border-slate-300 placeholder-slate-400
+										focus:outline-none focus:border-sky-500
+										focus:ring-sky-500 block w-full
+										rounded-md sm:text-sm focus:ring-1" />
 						<textarea class="mt-1 px-3 py-2
 										bg-white border shadow-sm
 										border-slate-300 placeholder-slate-400
@@ -59,8 +104,8 @@
 									name=""
 									id=""
 									v-model="formData.comment"
-									cols="20"
-									rows="7"></textarea>
+									cols="10"
+									rows="3"></textarea>
 					</div>
 					<button class="bg-yellow-400 font-bold rounded-xl py-2 px-4" type="submit">Rate it!</button>
 				</form>
@@ -68,14 +113,17 @@
 			<hr>
 			<!-- Comment Section -->
 			<div class="mt-4">
-				<h3 class="text-lg font-semibold mb-2">Ratings</h3>
-				<div class="bg-white p-4 shadow rounded-lg">
-					<!-- Single Comment -->
-					<div class="mb-4">
-						<h4 class="text-gray-700 font-semibold">John Doe</h4>
-						<p class="text-gray-600">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu dolor ac eros blandit ultrices.</p>
+				<h3 class="text-lg font-semibold mb-2">Sentimental Reviews</h3>
+				<div v-if="reviews && reviews.length" class="bg-white p-4 shadow rounded-lg">
+					<!-- Single Comment-->
+					<div v-for="(comment, index) in reviews" :key="index" class="mb-4">
+						<p>{{ comment.comment }}</p>
+						<p class="text-gray-600">{{ comment.positive }}</p>
+						<p class="text-gray-600">{{ comment.negative }}</p>
+						<p class="text-gray-600 text-sm">{{ comment.name }}</p>
 					</div>
 				</div>
+				<p v-else>0 reviews</p>
 			</div>
 		</div>
     </div>
