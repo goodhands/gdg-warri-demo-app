@@ -117,9 +117,11 @@
 				<div v-if="reviews && reviews.length" class="bg-white p-4 shadow rounded-lg">
 					<!-- Single Comment-->
 					<div v-for="(comment, index) in reviews" :key="index" class="mb-4">
+						<Icon v-if="comment?.positive?.toFixed(2) >= 0.5" name="material-symbols:thumb-up-outline" color="black" />
+						<Icon v-if="comment?.negative?.toFixed(2) >= 0.5" name="material-symbols:thumb-down-outline" color="black" />
+						<span>Pos: {{ comment?.positive?.toFixed(2) || 0 }}</span>
+						<span>Neg: {{ comment?.negative?.toFixed(2) || 0 }}</span>
 						<p>{{ comment.comment }}</p>
-						<p class="text-gray-600">{{ comment.positive }}</p>
-						<p class="text-gray-600">{{ comment.negative }}</p>
 						<p class="text-gray-600 text-sm">{{ comment.name }}</p>
 					</div>
 				</div>
