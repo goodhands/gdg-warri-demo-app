@@ -1,5 +1,5 @@
 <script setup>
-  const { data: product, pending, error } = await useFetch(() => 'http://www.omdbapi.com/?s=fast&apikey=713602fe&plot=short')
+  const { data: product, pending, error } = await useFetch(() => 'https://www.omdbapi.com/?s=fast&apikey=713602fe&plot=short')
 </script>
 
 <template>

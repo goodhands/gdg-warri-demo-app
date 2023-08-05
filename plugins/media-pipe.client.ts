@@ -1,7 +1,8 @@
 import { TextClassifier, FilesetResolver } from '@mediapipe/tasks-text'
-
 async function createClassifier() {
-	const textFiles = await FilesetResolver.forTextTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-text@latest/wasm');
+	const wasmPath = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-text@latest/wasm'
+
+	const textFiles = await FilesetResolver.forTextTasks(wasmPath);
 
 	const textClassifier = await TextClassifier.createFromOptions(
 		textFiles,
@@ -9,7 +10,8 @@ async function createClassifier() {
 			baseOptions: {
 				modelAssetPath: `/bert_classifier.tflite`
 			},
-			maxResults: 500
+			maxResults: 5,
+			scoreThreshold: 0.4
 		}
 	);
 

@@ -5,7 +5,7 @@
 	let realtimeChannel
 	const route = useRoute()
 	const { $textClassifier } = useNuxtApp()
-  	const { data: movie, pending, error } = await useFetch(() => 'http://www.omdbapi.com/?i=' + route.params.id + '&apikey=713602fe')
+  	const { data: movie, pending, error } = await useFetch(() => 'https://www.omdbapi.com/?i=' + route.params.id + '&apikey=713602fe')
 
 	// Fetch reviews and get the refresh method provided by useAsyncData
 	const { data: reviews, refresh: refreshReviews } = await useAsyncData('reviews', async () => {
@@ -119,10 +119,11 @@
 					<div v-for="(comment, index) in reviews" :key="index" class="mb-4">
 						<Icon v-if="comment?.positive?.toFixed(2) >= 0.5" name="material-symbols:thumb-up-outline" color="black" />
 						<Icon v-if="comment?.negative?.toFixed(2) >= 0.5" name="material-symbols:thumb-down-outline" color="black" />
-						<span>Pos: {{ comment?.positive?.toFixed(2) || 0 }}</span>
-						<span>Neg: {{ comment?.negative?.toFixed(2) || 0 }}</span>
 						<p>{{ comment.comment }}</p>
 						<p class="text-gray-600 text-sm">{{ comment.name }}</p>
+						<span class="text-gray-600 text-xs">Pos: {{ comment?.positive?.toFixed(2) || 0 }}</span>
+						&nbsp;
+						<span class="text-gray-600 text-xs">Neg: {{ comment?.negative?.toFixed(2) || 0 }}</span>
 					</div>
 				</div>
 				<p v-else>0 reviews</p>
