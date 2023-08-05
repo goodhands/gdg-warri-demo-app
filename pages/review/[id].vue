@@ -63,12 +63,12 @@
     <p v-if="pending">Fetching...</p>
     <p v-else-if="error">An error has occurred {{ error }}...</p>
     <div v-else class="p-9 gap-14">
-		<div class="bg-white justify-center shadow-lg border-gray-100 max-h-100 border sm:rounded-3xl p-8 flex space-x-10">
-			<div class="h-auto w-1/3 overflow-visible">
+		<div class="bg-white justify-center shadow-lg border-gray-100 max-h-100 border sm:rounded-3xl p-8 flex sm:flex-row flex-col sm:space-x-10 space-x-0 space-y-4">
+			<div class="h-auto w-full sm:w-1/3 overflow-visible">
 				<nuxt-link to="/" class="bg-yellow-400 text-xs font-bold inline-block rounded-xl mb-4 py-1 px-2">&lt; Back</nuxt-link>
 				<img class="rounded-3xl shadow-lg hover:scale-105 transition-all" :src="'https://img.omdbapi.com/?apikey=713602fe&i=' + route.params.id + '&h=1000'" :alt="movie.Title">
 			</div>
-			<div class="flex flex-col w-1/3 space-y-4">
+			<div class="flex flex-col w-full sm:w-1/3 space-y-4">
 				<div class="flex justify-between items-start">
 					<h2 class="text-3xl font-bold">{{movie.Title}}</h2>
 					<div class="bg-yellow-400 font-bold rounded-xl p-2">{{ movie.imdbRating }}</div>
@@ -112,7 +112,7 @@
 			</div>
 			<hr>
 			<!-- Comment Section -->
-			<div class="mt-4">
+			<div class="w-full sm:w-1/3 mt-4">
 				<h3 class="text-lg font-semibold mb-2">Sentimental Reviews</h3>
 				<div v-if="reviews && reviews.length" class="bg-white p-4 shadow rounded-lg">
 					<!-- Single Comment-->

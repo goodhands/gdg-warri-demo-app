@@ -8,7 +8,7 @@ async function createClassifier() {
 		textFiles,
 		{
 			baseOptions: {
-				modelAssetPath: `/bert_classifier.tflite`
+				modelAssetPath: `https://storage.googleapis.com/mediapipe-models/text_classifier/bert_classifier/float32/latest/bert_classifier.tflite`
 			},
 			maxResults: 5
 		}
