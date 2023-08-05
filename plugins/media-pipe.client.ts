@@ -10,8 +10,7 @@ async function createClassifier() {
 			baseOptions: {
 				modelAssetPath: `/bert_classifier.tflite`
 			},
-			maxResults: 5,
-			scoreThreshold: 0.4
+			maxResults: 5
 		}
 	);
 
